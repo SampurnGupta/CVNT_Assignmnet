@@ -1,36 +1,115 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Activity Booking API
 
-## Getting Started
+A simple RESTful API built with Next.js (App Router) and Supabase to manage activities and bookings.  
+Authenticate, view available activities, and book your spot—all with robust transactional logic and Supabase Auth.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Features
+
+- **User Authentication** (Sign up & Login)
+- **View Activities** (with available slots)
+- **Book Activities** (slots decrease automatically, no overbooking)
+- **View Your Bookings**
+- **Secure, Transactional Backend** (using Supabase/Postgres functions)
+- **Easy to test** (Postman collection compatible)
+
+---
+
+## Tech Stack
+
+- **Next.js** (App directory routing, pure JavaScript)
+- **Supabase** (Postgres, Auth, API)
+- **RESTful endpoints**
+
+---
+
+## API Endpoints
+
+All endpoints are under `/api/`  
+Examples below assume `http://localhost:3000/api/`
+
+### **Auth**
+
+#### `POST /signup`
+Create a new user.
+```json
+{
+  "email": "user@example.com",
+  "password": "yourpassword"
+}
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+#### `POST /login`
+Login and get access token.
+```json
+{
+  "email": "user@example.com",
+  "password": "yourpassword"
+}
+```
+Returns:  
+```json
+{
+  "user": { ... },
+  "session": {
+    "access_token": "..."
+  }
+}
+```
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### **Activities**
 
-## Learn More
+#### `GET /activities`
+Get all activities with available slots.
 
-To learn more about Next.js, take a look at the following resources:
+#### `GET /activities/:id`
+Get single activity by ID.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### **Bookings**
 
-## Deploy on Vercel
+#### `POST /book`
+Book an activity (authenticated route).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+**Headers:**
+```
+Authorization: Bearer <access_token>
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Body:**
+```json
+{
+  "activity_id": "<activity_uuid>"
+}
+```
+**Returns:**  
+`{ "message": "Booking successful!" }` or error message.
+
+---
+
+#### `GET /my-bookings`
+Get all bookings for the logged-in user.
+
+**Headers:**
+```
+Authorization: Bearer <access_token>
+```
+
+**Returns:**
+```json
+[
+  {
+    "id": "...",
+    "activity_id": "...",
+    "timestamp": "...",
+    "activities": {
+      "title": "...",
+      "location": "..."
+    }
+  }
+]
+```
