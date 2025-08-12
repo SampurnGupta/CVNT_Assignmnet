@@ -1,0 +1,38 @@
+SQL Query to create the SupaBase Tables:
+
+table named `activities` with the following fields:
+ id (UUID or integer)
+ title (string)
+ description (text)
+ location (string)
+ price (number)
+ available_slots (integer)
+
+
+-- Table: activities
+create table if not exists public.activities (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  description text,
+  location text,
+  price numeric not null,
+  available_slots integer not null
+);
+
+
+
+table named `bookings` with the following fields:
+ id
+ user_id (foreign key to Supabase auth users)
+ activity_id (foreign key to `activities`)
+
+ timestamp (datetime)
+
+
+-- Table: bookings
+create table if not exists public.bookings (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) on delete cascade,
+  activity_id uuid references activities(id) on delete cascade,
+  timestamp timestamptz not null default now()  // timestamptz: timestamp + timezone
+);
