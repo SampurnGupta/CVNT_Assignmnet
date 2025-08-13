@@ -24,10 +24,17 @@ Authenticate, view available activities, and book your spot—all with robust tr
 
 ---
 
+## Live Demo
+
+Access the deployed API and app here:  
+**[https://cvnt-assignmnet.vercel.app/](https://cvnt-assignmnet.vercel.app/)**
+
+---
+
 ## API Endpoints
 
 All endpoints are under `/api/`  
-Examples below assume `http://localhost:3000/api/`
+Examples below assume `https://cvnt-assignmnet.vercel.app/api/`
 
 ### **Auth**
 
@@ -64,6 +71,27 @@ Returns:
 
 #### `GET /activities`
 Get all activities with available slots.
+
+Supports **pagination and filtering** via query parameters:
+- `page`: Page number (default: 1)
+- `limit`: Number of results per page (default: 10)
+- `title`: Filter by activity title (optional, partial match)
+- `location`: Filter by activity location (optional, partial match)
+
+Example:
+```
+GET /activities?page=2&limit=5&title=yoga&location=delhi
+```
+Returns:
+```json
+{
+  "activities": [ ... ],
+  "total": 37,
+  "page": 2,
+  "limit": 5,
+  "pages": 8
+}
+```
 
 #### `GET /activities/:id`
 Get single activity by ID.
