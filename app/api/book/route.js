@@ -5,8 +5,8 @@ User must be authenticated (must provide a valid Supabase access token in the he
 Check if available_slots > 0 for the selected activity.
 If yes, insert a new booking, and decrement available_slots by 1.
 If not, return an error.
+Prevents duplicate bookings per user per activity via RPC function.
 
-Yet to Implement: one User: one booking
 */
 
 import { supabase } from '../../../utils/supabaseClient';
@@ -40,14 +40,16 @@ export async function POST(request) {
     return new Response(JSON.stringify({ error: 'No slots available' }), { status: 400 });
   }
 
-  // Create booking and decrement available_slots (transactional logic)
-  // preventing race condition
+  // Transactional booking: prevents race conditions and duplicate booking
   const { error: bookingError } = await supabase.rpc('book_activity', {
     activity_id_input: activity_id,
     user_id_input: user.id
   });
 
   if (bookingError) {
+    if (bookingError.message.includes('User already booked')) {
+      return new Response(JSON.stringify({ error: 'You have already booked this activity.' }), { status: 400 });
+    }
     return new Response(JSON.stringify({ error: 'Booking failed: ' + bookingError.message }), { status: 500 });
   }
 
